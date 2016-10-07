@@ -1,12 +1,15 @@
 package PlaceData;
 import java.io.FileInputStream;
+import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
 
 import PlaceData.PlaceDataProto.Place;
 import PlaceData.PlaceDataProto.PlaceList;
 
 
-public class PlaceDataServer 
-{
+public class PlaceDataServer extends UnicastRemoteObject implements PlaceDataInterface
+
+{/*
 	public static void main(String[]args)
 	{
 		//Place.Builder place = new Place.newBuilder();
@@ -32,9 +35,18 @@ public class PlaceDataServer
 				System.out.println("Place: " + place.getName());
 			}
 		}
-	
-		public static String getInfo(PlaceList placeList, String city)
+	*/
+		protected PlaceDataServer() throws RemoteException {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+
+		public String getInfo(String city)throws RemoteException
 		{
+			try{
+				PlaceList placeList = PlaceList.parseFrom(new FileInputStream("places-proto.bin"));
+			
+			
 			double lat,lon=0;
 			String state="";
 			String str="";
@@ -58,8 +70,12 @@ public class PlaceDataServer
 			}
 			else
 				return "City Not Found";
-			
-			
+			}
+			catch(Exception e)
+			{
+				return "Err occured";
+			}
+						
 			//return "";
 		}
 	

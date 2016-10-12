@@ -1,6 +1,7 @@
 package PlaceData;
 import java.io.FileInputStream;
 
+
 import PlaceData.PlaceDataProto.Place;
 import PlaceData.PlaceDataProto.PlaceList;
 

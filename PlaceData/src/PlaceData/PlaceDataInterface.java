@@ -5,6 +5,6 @@ import java.rmi.RemoteException;
 
 public interface PlaceDataInterface extends Remote 
 {
-	public String getInfo(String city) throws RemoteException;
+	public String getInfo(String city,String state1) throws RemoteException;
 	
 }

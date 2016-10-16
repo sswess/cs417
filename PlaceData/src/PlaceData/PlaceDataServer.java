@@ -22,7 +22,7 @@ implements PlaceDataInterface {
 		}
 
 
-		public String getInfo(String city)throws RemoteException
+		public String getInfo(String city, String state1)throws RemoteException
 		{
 			try{
 				PlaceList placeList = PlaceList.parseFrom(new FileInputStream("places-proto.bin"));
@@ -34,7 +34,7 @@ implements PlaceDataInterface {
 			boolean flag = false;
 			for (Place place: placeList.getPlaceList())
 			{	
-				if(place.getName().equals(city))
+				if(place.getName().equals(city) && place.getState().equals(state1))
 				{
 					flag = true;
 					lat = place.getLat();

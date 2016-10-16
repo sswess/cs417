@@ -1,47 +1,28 @@
 package PlaceData;
 import java.io.FileInputStream;
+import java.rmi.Remote;
 import java.rmi.RemoteException;
-import java.rmi.server.UnicastRemoteObject;
+import java.rmi.server.*;
+
 
 import PlaceData.PlaceDataProto.Place;
 import PlaceData.PlaceDataProto.PlaceList;
 
 
-public class PlaceDataServer extends UnicastRemoteObject implements PlaceDataInterface
+public class PlaceDataServer
+extends UnicastRemoteObject
+implements PlaceDataInterface {
 
-{/*
-	public static void main(String[]args)
-	{
-		//Place.Builder place = new Place.newBuilder();
-		//PlaceList placeList;
-		try{	
-				PlaceList placeList = PlaceList.parseFrom(new FileInputStream("places-proto.bin"));
-				//sol(placeList);
-				
-				System.out.println(getInfo(placeList, "Hackberry town"));
-		}
-		catch(Exception e)
-		{
-			System.out.println("FILE NOT FOUND");
-		}
-		//System.out.println("Good to go BOI!!");
-		
-	}
-	
-		public static void sol(PlaceList placeList)
-		{
-			for (Place place: placeList.getPlaceList())
-			{	
-				System.out.println("Place: " + place.getName());
-			}
-		}
-	*/
-		protected PlaceDataServer() throws RemoteException {
-		super();
-		// TODO Auto-generated constructor stub
-	}
 
-		public String getInfo(String city)throws RemoteException
+	private int a;
+		public PlaceDataServer() throws RemoteException
+		{
+			System.out.println("New instance of Sample created");
+			a=1;
+		}
+
+
+		public String getInfo(String city, String state1)throws RemoteException
 		{
 			try{
 				PlaceList placeList = PlaceList.parseFrom(new FileInputStream("places-proto.bin"));
@@ -53,7 +34,7 @@ public class PlaceDataServer extends UnicastRemoteObject implements PlaceDataInt
 			boolean flag = false;
 			for (Place place: placeList.getPlaceList())
 			{	
-				if(place.getName().equals(city))
+				if(place.getName().equals(city) && place.getState().equals(state1))
 				{
 					flag = true;
 					lat = place.getLat();

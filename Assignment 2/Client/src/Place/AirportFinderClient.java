@@ -3,7 +3,7 @@ package Place;
 import java.rmi.Naming;
 import java.rmi.registry.LocateRegistry;
 
-//import AirportData.AirportDataInterface;
+import AirportData.AirportDataInterface;
 import PlaceData.PlaceDataInterface;
 
 
@@ -18,34 +18,39 @@ public class AirportFinderClient {
 		}
 		try {
 			// Attempt to find place server
-			int port1 = Integer.parseInt(args[1]);
 			String url1 = "//" + args[0] + ":" + args[1] + "/placeServer";
 			System.out.println("looking up place server at " + url1);
 			// look up the remote object named “PlaceDataInterface”
 			PlaceDataInterface placeInterface = (PlaceDataInterface)Naming.lookup(url1);
 			
 			// Attempt to find airport server
-			int port2 = Integer.parseInt(args[3]);
-			String url2 = "//" + args[2] + ":" + args[3] + "/airoportServer";
+			String url2 = "//" + args[2] + ":" + args[3] + "/airportServer";
+			System.out.println("looking up airport server at " + url2);
 			// look up the remote object named “AirportDataInterface”
-			//AirportDataInterface airportInterface = (AirportDataInterface)Naming.lookup(url2);
+			AirportDataInterface airportInterface = (AirportDataInterface)Naming.lookup(url2);
 			
-//Return type subject to change
 			// Get place information
-			String placeData[] = placeInterface.getInfo(args[4], args[5]).split("");
-			// Get corresponding airport location
-			//String airportData = airportInterface.getAirport(Double.parseDouble(placeData[2]),
-			//												Double.parseDouble(placeData[3]));
+			String placeData[] = placeInterface.getInfo(args[4], args[5]).split(",");
 			
-			String temp = "";
-			for (int i = 0; i < placeData.length; i++){
-				temp += placeData[i];
+			// Code, Name, State, Distance
+			String[][] airportData = new String[5][4];
+			if(!placeData[0].equals("City Not Found")){
+				System.out.println("\nLooking for airports near " + placeData[0] + "...");
+				
+				// Get corresponding airport location
+				airportData = airportInterface.getdistance(Double.parseDouble(placeData[2]),
+																Double.parseDouble(placeData[3]));
+				
+				for (int i = 0; i < 5; i++){
+					System.out.println((i + 1) + ": " + airportData[i][0] + " " + airportData[i][1] +
+										" " + airportData[i][2] + " " + airportData[i][3]);
+				}
 			}
-			
-			String[] outputData  = temp.split(" ");
+			else { System.out.println("The city " + args[4] + ", " + args[5] + " was not found."); }
 			
 		} catch(Exception e) {
-			System.out.println("Client exception: " + e);
+			System.out.print("Client exception: ");
+			e.printStackTrace();
 		}
 	}
 }

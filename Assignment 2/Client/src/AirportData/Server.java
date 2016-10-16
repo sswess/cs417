@@ -1,25 +1,33 @@
 package AirportData;
 
-//import AirportData.AirportDataProto.AirportList;
-import AirportData.AirportDataProto.AirportList;
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.InputStreamReader;
-import java.io.IOException;
-import java.io.PrintStream;
+import java.rmi.Naming;
+import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+
+import java.rmi.server.UnicastRemoteObject;
 
 public class Server 
 {
 	public static void main(String[]args)
 	{
-		
-		
-		
-		
-		
-		
+        if (args.length != 1) {
+            System.err.println("usage: java AirportServer rmi_port");
+            System.exit(1);
+        }
+        int port = Integer.parseInt(args[0]);
+
+        try {            
+            LocateRegistry.createRegistry(port);
+            String url = "//localhost:" + port + "/airportServer";
+            System.out.println("binding " + url);
+            Naming.rebind(url, new AirportDataServer());
+            System.out.println("server " + url + " is running...");
+           
+        }
+        catch (Exception e) 
+        {
+        	e.printStackTrace();
+        }
 	}
 
 }

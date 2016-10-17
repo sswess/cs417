@@ -34,7 +34,7 @@ public class AirportFinderClient {
 			
 			// Code, Name, State, Distance
 			String[][] airportData = new String[5][4];
-			if(!placeData[0].equals("City Not Found")){
+			if(!placeData[0].equals("City Not Found") || !placeData[0].equals("Err occured")){
 				System.out.println("\nLooking for airports near " + placeData[0] + "...");
 				
 				// Get corresponding airport location
@@ -42,8 +42,10 @@ public class AirportFinderClient {
 																Double.parseDouble(placeData[3]));
 				
 				for (int i = 0; i < 5; i++){
+					// Convert distance to miles, output airports.
+					int distance = (int)Double.parseDouble(airportData[i][3]) / 1600;
 					System.out.println((i + 1) + ": " + airportData[i][0] + " " + airportData[i][1] +
-										" " + airportData[i][2] + " " + airportData[i][3]);
+										" " + airportData[i][2] + " " + distance + " miles");
 				}
 			}
 			else { System.out.println("The city " + args[4] + ", " + args[5] + " was not found."); }

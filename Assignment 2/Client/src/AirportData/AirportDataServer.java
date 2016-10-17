@@ -18,7 +18,7 @@ implements AirportDataInterface
 		System.out.println("New instance of Sample created");
 		a=1;
 	}
-	public static int distFrom(double lat1, double lon1, double lat2, double lon2) {
+	public static float distFrom(double lat1, double lon1, double lat2, double lon2) {
 	    double earthRadius = 6371000; //meters
 	    double dLat = Math.toRadians(lat2-lat1);
 	    double dLng = Math.toRadians(lon2-lon1);
@@ -26,9 +26,9 @@ implements AirportDataInterface
 	               Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) *
 	               Math.sin(dLng/2) * Math.sin(dLng/2);
 	    double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-	    float dist = (float) (earthRadius * c) / (float)1600;
+	    float dist = (float) (earthRadius * c);
 
-	    return (int)dist;
+	    return dist;
 	}
 	
 	public String[][] getdistance(double lat1, double lon1){

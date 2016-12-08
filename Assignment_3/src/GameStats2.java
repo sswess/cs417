@@ -6,9 +6,11 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
 
+import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.*;
 import org.apache.hadoop.mapred.Reporter;
+import org.apache.hadoop.mapred.Task;
 import org.apache.hadoop.mapreduce.*;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
@@ -20,14 +22,13 @@ import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
-
 import org.apache.hadoop.io.*;
 import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.Mapper;
 */
 
 
-public class GameStats2 {
+public class GameStats {
 	
 	public static enum TOTAL_COUNTER { BLACK, WHITE, DRAW, ALL };
 	
@@ -38,7 +39,7 @@ public class GameStats2 {
 	      private Text white = new Text("White");
 	      private Text black = new Text("Black");
 	         
-	           public void map(LongWritable key, Text value, Context context, Reporter reporter) throws IOException, InterruptedException
+	           public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException
 	           {
 	        	   System.out.println("Attempting map");
 	        	   
@@ -48,17 +49,20 @@ public class GameStats2 {
 	               while (tokenizer.hasMoreTokens())
 	               {
 	            	   String temp = tokenizer.nextToken();
-	            	   if(temp.contains("/")){
+	            	   if (temp.equals("[Result")){
+	            		   
+	            	   }
+	            	   else if(temp.contains("/")){
 	            		   context.write(draw, one);
-	            		   reporter.getCounter(TOTAL_COUNTER.DRAW).increment(1);
+	            		   context.getCounter(TOTAL_COUNTER.DRAW).increment(1);
 	            	   }
 	            	   else if(temp.contains("1-0")){
 	            		   context.write(white, one);
-	            		   reporter.getCounter(TOTAL_COUNTER.WHITE).increment(1);
+	            		   context.getCounter(TOTAL_COUNTER.WHITE).increment(1);
 	            	   }
 	            	   else {
 	            		   context.write(black, one);
-	            		   reporter.getCounter(TOTAL_COUNTER.BLACK).increment(1);
+	            		   context.getCounter(TOTAL_COUNTER.BLACK).increment(1);
 	            	   }
 	            	   context.getCounter(TOTAL_COUNTER.ALL).increment(1);
 	               }
@@ -66,19 +70,33 @@ public class GameStats2 {
            
 	}
 	
-	public static class Reduce extends Reducer<Text, IntWritable, Text, IntWritable>
+	public static class Reduce extends Reducer<Text, IntWritable, Text, Text>
 	{
+		
+		static private long mapperCounter; 
+		
+	    @Override
+	    public void setup(Context context) throws IOException, InterruptedException{
+	        Configuration conf = context.getConfiguration();
+	        Cluster cluster = new Cluster(conf);
+	        Job currentJob = cluster.getJob(context.getJobID());
+	        mapperCounter = currentJob.getCounters().findCounter(TaskCounter.MAP_INPUT_RECORDS).getValue();  
+	    }
 		
 	      public void reduce(Text key, Iterable<IntWritable> values, Context context) throws IOException, InterruptedException
 	      {
+	    	  String output = "default";
 	    	  int sum = 0;
 	            for (IntWritable value : values)
 	            {
-	                  sum += value.get();
+	                  sum++;
 	            }
+	            long total = mapperCounter;
+	            float percentage = (float)sum / total;
 	            
+	            output = sum + "\t" + percentage ;
 	            
-	            context.write(key, new IntWritable(sum));
+	            context.write(key, new Text(output));
 	       }
 	      
 	}
@@ -87,7 +105,7 @@ public class GameStats2 {
 		 //Configuration conf = getConf();
 	     Job job = new Job();
 	     job.setJobName("Game Stats");
-	     job.setJarByClass(GameStats2.class);
+	     job.setJarByClass(GameStats.class);
 	     
 	     job.setMapperClass(Map.class);
 	     job.setReducerClass(Reduce.class);
@@ -117,7 +135,7 @@ public class GameStats2 {
 	    		 "\nBlack \t"+countBLACK+"\t"+percentBLACK+
 	    		 "\nDraw \t"+countDRAW+"\t"+percentDRAW;
 	     
-	     File outputFile = new File(args[1]+"output.txt");
+	     File outputFile = new File(args[1]+"/output.txt");
 	     
 	     try{
 	    	 FileWriter fw = new FileWriter(outputFile);

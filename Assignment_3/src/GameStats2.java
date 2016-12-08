@@ -8,6 +8,7 @@ import java.util.*;
 
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.*;
+import org.apache.hadoop.mapred.Reporter;
 import org.apache.hadoop.mapreduce.*;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
@@ -37,8 +38,10 @@ public class GameStats2 {
 	      private Text white = new Text("White");
 	      private Text black = new Text("Black");
 	         
-	           public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException
+	           public void map(LongWritable key, Text value, Context context, Reporter reporter) throws IOException, InterruptedException
 	           {
+	        	   System.out.println("Attempting map");
+	        	   
 	               String line = value.toString();
 	               StringTokenizer tokenizer = new StringTokenizer(line);
 	           
@@ -47,15 +50,15 @@ public class GameStats2 {
 	            	   String temp = tokenizer.nextToken();
 	            	   if(temp.contains("/")){
 	            		   context.write(draw, one);
-	            		   context.getCounter(TOTAL_COUNTER.DRAW).increment(1);
+	            		   reporter.getCounter(TOTAL_COUNTER.DRAW).increment(1);
 	            	   }
 	            	   else if(temp.contains("1-0")){
 	            		   context.write(white, one);
-	            		   context.getCounter(TOTAL_COUNTER.WHITE).increment(1);
+	            		   reporter.getCounter(TOTAL_COUNTER.WHITE).increment(1);
 	            	   }
 	            	   else {
 	            		   context.write(black, one);
-	            		   context.getCounter(TOTAL_COUNTER.BLACK).increment(1);
+	            		   reporter.getCounter(TOTAL_COUNTER.BLACK).increment(1);
 	            	   }
 	            	   context.getCounter(TOTAL_COUNTER.ALL).increment(1);
 	               }
